@@ -1,0 +1,29 @@
+﻿@using Newtonsoft.Json
+@model Municipei.Models.HomeModel
+@{
+    ViewData["Title"] = "Verificação de Código";
+    var serialized = TempData["HomeModel"] as string;
+    var savedModel = string.IsNullOrEmpty(serialized)
+        ? new HomeModel()
+        : JsonConvert.DeserializeObject<HomeModel>(serialized);
+}
+
+<h2>Digite o Código</h2>
+<p>Código enviado para: <strong>@savedModel.Email</strong></p>
+
+<form asp-controller="Home" asp-action="Register" method="post">
+    @Html.AntiForgeryToken()
+
+    <input type="hidden" asp-for="Name" value="@savedModel.Name" />
+    <input type="hidden" asp-for="Password" value="@savedModel.Password" />
+    <input type="hidden" asp-for="Cpf" value="@savedModel.Cpf" />
+    <input type="hidden" asp-for="MunPR" value="@savedModel.MunPR" />
+    <input type="hidden" asp-for="Occupation" value="@savedModel.Occupation" />
+    <input type="hidden" asp-for="Phone" value="@savedModel.Phone" />
+    <input type="hidden" asp-for="Email" value="@savedModel.Email" />
+
+    <div class="mb-3">
+        <input name="answer" id="codeInput" class="form-control" maxlength="6" placeholder="Código de 6 dígitos" required />
+    </div>
+    <button type="submit" class="btn btn-primary">Validar Código</button>
+</form>

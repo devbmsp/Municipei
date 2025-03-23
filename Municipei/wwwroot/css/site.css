@@ -1,0 +1,70 @@
+﻿/* CSS já existente */
+html {
+    font-size: 14px;
+    position: relative;
+    min-height: 100%;
+}
+
+@media (min-width: 768px) {
+    html {
+        font-size: 16px;
+    }
+}
+
+.btn:focus,
+.btn:active:focus,
+.btn-link.nav-link:focus,
+.form-control:focus,
+.form-check-input:focus {
+    box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
+}
+
+body {
+    margin-bottom: 60px;
+}
+
+
+.send-email-container {
+    background: #fff;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    padding: 2rem;
+    width: 320px;
+    text-align: center;
+    margin: 2rem auto;
+}
+
+    .send-email-container h2 {
+        margin-bottom: 1rem;
+        color: #333;
+    }
+
+    .send-email-container p {
+        margin-bottom: 1.5rem;
+        color: #666;
+    }
+
+    .send-email-container input[type="email"],
+    .send-email-container input[type="text"] {
+        width: 100%;
+        padding: 0.75rem;
+        margin-bottom: 1rem;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+    }
+
+    .send-email-container button {
+        width: 100%;
+        padding: 0.75rem;
+        background: #258cfb; 
+        color: #fff;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 1rem;
+        transition: background 0.3s ease;
+    }
+
+        .send-email-container button:hover {
+            background: #1e78d2; 
+        }
