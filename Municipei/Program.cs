@@ -5,38 +5,41 @@ using Google.Cloud.Firestore;
 using Google.Cloud.Firestore.V1;
 using Municipei.Interface;
 using Municipei.Service;
-using System.Text.Json;
-using System.Text;
-
 
 var builder = WebApplication.CreateBuilder(args);
+
 GoogleCredential credential = GoogleCredential.FromFile("wwwroot/Data/municipeibd-firebase-adminsdk-fbsvc-85a7e4a7f5.json");
-FirebaseApp.Create(new AppOptions()
+FirebaseApp.Create(new AppOptions
 {
     Credential = credential
 });
+
 var firestoreClientBuilder = new FirestoreClientBuilder
 {
     Credential = credential
 };
 FirestoreClient firestoreClient = firestoreClientBuilder.Build();
 
-// 4. Cria o FirestoreDb usando o FirestoreClient
 FirestoreDb data = FirestoreDb.Create("municipeibd", firestoreClient);
+
 builder.Services.AddSingleton(data);
 
-
-// Add services to the container.
 builder.Services.AddControllersWithViews();
+
 builder.Services.AddScoped<IHomeModel, HomeService>();
+builder.Services.AddScoped<ISessao, Sessao>();
+
+builder.Services.AddHttpContextAccessor();
+
+builder.Services.AddDistributedMemoryCache();
+builder.Services.AddSession();
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
 {
+
     app.UseExceptionHandler("/Home/Error");
-    // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
     app.UseHsts();
 }
 
@@ -45,11 +48,16 @@ app.UseStaticFiles();
 
 app.UseRouting();
 
+// Habilita uso de sessão
+app.UseSession();
+
+// Se precisar de autorização
 app.UseAuthorization();
 
+// Mapeamento de rotas
 app.MapControllerRoute(
     name: "default",
-    pattern: "{controller=Home}/{action=Index}/{id?}");
+    pattern: "{controller=Home}/{action=Index}/{id?}"
+);
 
 app.Run();
-

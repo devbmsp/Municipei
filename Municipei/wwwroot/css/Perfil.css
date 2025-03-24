@@ -1,0 +1,40 @@
+.dashboard-container {
+    max-width: 800px;
+    margin: 2rem auto;
+    padding: 1rem;
+    background-color: #f9f9f9;
+    border-radius: 6px;
+    box-shadow: 0 0 10px rgba(0,0,0,0.1);
+}
+
+.info-message {
+    color: #c0392b;
+    font-weight: 600;
+    text-align: center;
+    margin: 2rem 0;
+}
+
+.welcome-title {
+    color: #2c3e50;
+    font-size: 2rem;
+    margin-bottom: 1rem;
+}
+
+.welcome-text {
+    color: #555;
+    font-size: 1.1rem;
+    margin-bottom: 2rem;
+    line-height: 1.5;
+}
+
+.user-info h2 {
+    font-size: 1.4rem;
+    margin-bottom: 1rem;
+    color: #333;
+}
+
+.user-info p {
+    font-size: 1rem;
+    margin-bottom: 0.5rem;
+    color: #444;
+}

@@ -1,4 +1,5 @@
-﻿@model HomeModel
+﻿@using Municipei.Interface
+@inject ISessao Sessao
 <!DOCTYPE html>
 <html lang="en">
 
@@ -22,31 +23,36 @@
                 </button>
                 <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
                     <ul class="navbar-nav flex-grow-1">
-                        @if(string.IsNullOrEmpty(@Model.Occupation) ){
+                                                @if (Sessao.BuscarSessaoDoUsuario() != null)
+                        {
                             <li class="nav-item">
-                                <a class="nav-link text-dark" asp-controller="Home" asp-action="Index">Cadastro</a>
+                                <a class="btn btn-outline-danger" class="nav-link text-dark" asp-area=""
+                                    asp-controller="Home" asp-action="Sair">Logout</a>
                             </li>
+                        }
+                        else
+                        {
                             <li class="nav-item">
                                 <a class="nav-link text-dark" asp-controller="Home" asp-action="Login">Login</a>
                             </li>
                         }
-                        else{
-                            @if (@Model.Occupation == "admin")
-                            {
-                                <li class="nav-item">
-                                    <a class="nav-link text-dark" asp-controller="Home" asp-action="Admin">Painel Master</a>
-                                </li>
-                            }
-                            <li class="nav-item">
-                                <a class="nav-link text-dark" asp-controller="Home" asp-action="DashBoard">DashBoard</a>
-                            </li>
-                            }
+                        <li class="nav-item">
+                            <a class="nav-link text-dark" asp-controller="Home" asp-action="Index">Cadastro</a>
+                        </li>
+
+                        <li class="nav-item">
+                            <a class="nav-link text-dark" asp-controller="Home" asp-action="Admin">Painel Master</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-dark" asp-controller="Home" asp-action="Perfil">Perfil</a>
+                        </li>
+
                     </ul>
-                    
+
                 </div>
             </div>
         </nav>
-        
+
     </header>
     <div class="container">
         <main role="main" class="pb-3">

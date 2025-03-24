@@ -9,7 +9,7 @@ namespace Municipei.Interface
 
          Task<HomeModel> Login(string email, string pass, CollectionReference user);
 
-         Task<string> SendCode(string email);
+         Task<string> SendCode(string email, CollectionReference user);
 
     }
 }

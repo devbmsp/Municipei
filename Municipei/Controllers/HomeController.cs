@@ -15,11 +15,12 @@ namespace Municipei.Controllers
         private readonly string admin = "admin@admin.com";
         private readonly string passwordAdmin = "admin123";
         private readonly string occupationadm = "admin";
-
+        private readonly ISessao _sessao;
         private FirestoreDb _bd;
         private readonly IHomeModel _service;
-        public HomeController(FirestoreDb db, IHomeModel service)
+        public HomeController(FirestoreDb db, IHomeModel service, ISessao sessao)
         {
+            _sessao = sessao;
             _bd = db;
             _service = service;
         }
@@ -27,12 +28,12 @@ namespace Municipei.Controllers
         {
             var json = System.IO.File.ReadAllText("wwwroot/Data/JsonModel.Json");
             var municipios = JsonConvert.DeserializeObject<List<MunicipiosList>>(json)!;
-
-            var model = new HomeModel
+            var vm = new RegisterViewModel
             {
                 Municipios = municipios
             };
-            return View(model);
+
+            return View(vm);
         }
 
         public IActionResult Login()
@@ -43,11 +44,35 @@ namespace Municipei.Controllers
         {
             return View();
         }
-        public IActionResult DashBoard()
+        public IActionResult Admin()
         {
-            return View();
+            var usuarioLogado = _sessao.BuscarSessaoDoUsuario();
+
+            if (usuarioLogado == null || usuarioLogado.Occupation != "admin")
+            {
+                return View("Admin", null);
+            }
+
+            return View("Admin", usuarioLogado);
         }
-        [HttpGet]
+        public IActionResult Perfil()
+        {
+            var usuarioLogado = _sessao.BuscarSessaoDoUsuario();
+
+            if (usuarioLogado == null )
+            {
+                return View("Perfil", null);
+            }
+
+            return View("Perfil", usuarioLogado);
+        }
+
+        public IActionResult Sair()
+        {
+            _sessao.RemoverSessaoUsuario();
+            return RedirectToAction("Login");
+        }
+        [HttpPost]
         public async Task<IActionResult> LoginUser(string email, string password)
         {
             try
@@ -61,13 +86,25 @@ namespace Municipei.Controllers
                 }
                 else if (user.Email == admin && user.Occupation == occupationadm && user.Password == passwordAdmin)
                 {
+                    try
+                    {
+                        HttpContext.Session.SetString("UserId", user.Id.ToString());
+                        _sessao.CriarSessaoDoUsuario(user);
+                    }
+                    catch (Exception ex)
+                    {
+                        TempData["MensagemErro"] = "Não foi possivel estabalecer a conexão !";
+                        return View("Login");
+                    }
                     TempData["MensagemSucesso"] = "Bem-vindo Admin!";
                     return View("Admin", user);
                 }
                 else
                 {
                     TempData["MensagemSucesso"] = $"Login realizado com sucesso: ";
-                    return View("DashBoard", user);
+                    HttpContext.Session.SetString("UserId", user.Id.ToString());
+                    _sessao.CriarSessaoDoUsuario(user);
+                    return View("Perfil", user);
                 }
             }
             catch (Exception)
@@ -83,7 +120,14 @@ namespace Municipei.Controllers
         {
             try
             {
-                var code = await _service.SendCode(model.Email);
+                CollectionReference user = _bd.Collection("user");
+
+                var code = await _service.SendCode(model.Email, user);
+                if (code == null)
+                {
+                    TempData["MensagemErro"] = "Conta já existente com esse email";
+                    return View("Index");
+                }
                 if (code == "Erro" || code == null)
                 {
                     TempData["MensagemErro"] = "Não conseguimos realizar sua autenticação";
@@ -111,9 +155,14 @@ namespace Municipei.Controllers
                 if (answer == code)
                 {
                     CollectionReference user = _bd.Collection("user");
-                    await _service.RegisterClient(model, user);
-                    TempData["MensagemSucesso"] = "Conseguimos realizar Sua Authenticação, Perfil Criado!";
-                    return View("Login");
+                    var response = await _service.RegisterClient(model, user);
+                    if (response != null)
+                    {
+                        TempData["MensagemSucesso"] = "Conseguimos realizar Sua Authenticação, Perfil Criado!";
+                        return View("Login");
+                    }
+                    TempData["MensagemErro"] = "Não conseguimos realizar Sua Authenticação";
+                    return View("Index");
                 }
                 else
                 {

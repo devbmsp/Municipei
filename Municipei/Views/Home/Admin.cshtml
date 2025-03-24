@@ -2,6 +2,10 @@
 @{
     ViewData["Title"] = "Painel Master";
 }
-
-<h1>Bem Vindo ao Painel Principal @Model.Name</h1>
-
+@if (Model == null || Model.Occupation != "admin" )
+{
+    <h1>Você não possui permissão para acessar essa página, Somente Administradores são autorizados</h1>
+}
+else{
+    <h1>Bem Vindo ao Painel Principal @Model.Name</h1>
+}

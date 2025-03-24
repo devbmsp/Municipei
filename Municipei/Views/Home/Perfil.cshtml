@@ -1,0 +1,35 @@
+﻿@model HomeModel
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - Perfil</title>
+
+    <link rel="stylesheet" href="~/css/Perfil.css" asp-append-version="true" />
+</head>
+@if (Model == null  )
+{
+<h1>Se cadatre e faça seu Login Para ter acesso ao Seu Perfil</h1>
+}
+else{
+
+   <h1 class="welcome-title">Bem-vindo(a) @Model.Name ao Municipei!</h1>
+        <p class="welcome-text">
+            Aqui, você pode cadastrar informações, acompanhar estatísticas e gerenciar dados do município de forma simples. 
+            Aproveite o painel para tornar a administração mais eficiente e aproximar governo e população!
+        </p>
+
+        <div class="user-info">
+            <h2>Suas Informações:</h2>
+            <p><strong>Nome:</strong> @Model.Name</p>
+            <p><strong>CPF:</strong> @Model.Cpf</p>
+            <p><strong>Email:</strong> @Model.Email</p>
+            <p><strong>Telefone:</strong> @Model.Phone</p>
+            <p><strong>Município:</strong> @Model.MunPR</p>
+            <p><strong>Cargo:</strong> @Model.Occupation</p>
+        </div>
+    }
+</div>
+

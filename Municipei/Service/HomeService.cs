@@ -9,61 +9,74 @@ namespace Municipei.Service
 {
     public class HomeService : IHomeModel
     {
-        public async Task<string> SendCode(string email)
+        public async Task<string> SendCode(string email, CollectionReference user)
         {
-            string fromEmail = "brunomatheuspires1@gmail.com";
-            string fromPassword = "ayqj idau ihge krnw ";
-            string code = "";
-            Random random = new Random();
-            for (int i = 0; i < 6; i++)
-            {
-                code += random.Next(0, 10).ToString();
-            }
-
-            var message = new MimeMessage();
-            message.From.Add(new MailboxAddress("Municipei", fromEmail));
-            message.To.Add(new MailboxAddress("", email));
-            message.Subject = "Código Municipei";
-            message.Body = new TextPart("html")
-            {
-                Text = $"Olá, seu código é: {code}"
-            };
-
-            using var client = new SmtpClient();
             try
             {
+                var query = user.WhereEqualTo("email", email);
+                var snapshot = await query.GetSnapshotAsync();
+                if (snapshot.Count > 0)
+                {
+                    return null;
+                }
+                string fromEmail = "brunomatheuspires1@gmail.com";
+                string fromPassword = "ayqj idau ihge krnw ";
+                string code = "";
+                Random random = new Random();
+                for (int i = 0; i < 6; i++)
+                {
+                    code += random.Next(0, 10).ToString();
+                }
+
+                var message = new MimeMessage();
+                message.From.Add(new MailboxAddress("Municipei", fromEmail));
+                message.To.Add(new MailboxAddress("", email));
+                message.Subject = "Código Municipei";
+                message.Body = new TextPart("html")
+                {
+                    Text = $"Olá, seu código é: {code}"
+                };
+
+                using var client = new SmtpClient();
+
                 await client.ConnectAsync("smtp.gmail.com", 587, SecureSocketOptions.StartTls);
                 await client.AuthenticateAsync(fromEmail, fromPassword);
                 await client.SendAsync(message);
                 await client.DisconnectAsync(true);
                 return code;
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                Console.WriteLine("Erro ao enviar o código para o email: " + ex.Message);
                 return "Erro";
             }
         }
 
         public async Task<HomeModel> RegisterClient(HomeModel model, CollectionReference user)
         {
-            var newUser = new HomeModel()
+            try
             {
-                Password = model.Password,
-                Cpf = model.Cpf,
-                Email = model.Email,
-                MunPR = model.MunPR,
-                Name = model.Name,
-                Occupation = model.Occupation,
-                Phone = model.Phone
-            };
-            await user.AddAsync(newUser);
-            return newUser;
+                var newUser = new HomeModel()
+                {
+                    Password = model.Password,
+                    Cpf = model.Cpf,
+                    Email = model.Email,
+                    MunPR = model.MunPR,
+                    Name = model.Name,
+                    Occupation = model.Occupation,
+                    Phone = model.Phone
+                };
+                await user.AddAsync(newUser);
+                return newUser;
+            }
+            catch(Exception)
+            {
+                return null;
+            }
         }
 
         public async Task<HomeModel> Login(string email, string pass, CollectionReference user)
         {
-           try
+            try
             {
                 var query = user.WhereEqualTo("email", email);
                 var snapshot = await query.GetSnapshotAsync();
@@ -73,6 +86,7 @@ namespace Municipei.Service
                     string password = infoLogin.GetValue<string>("password");
                     if (password != null && password == pass)
                     {
+                        int id = infoLogin.GetValue<int>("id");
                         string emailUser = infoLogin.GetValue<string>("email");
                         string cpf = infoLogin.GetValue<string>("cpf");
                         string occup = infoLogin.GetValue<string>("occupation");
@@ -81,6 +95,7 @@ namespace Municipei.Service
                         string name = infoLogin.GetValue<string>("name");
                         var userEnter = new HomeModel()
                         {
+                            Id = id,
                             Password = password,
                             Cpf = cpf,
                             Email = emailUser,
@@ -92,7 +107,7 @@ namespace Municipei.Service
                         return userEnter;
                     }
                 }
-                    return null;
+                return null;
             }
             catch (Exception ex)
             {
