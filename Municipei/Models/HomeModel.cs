@@ -30,6 +30,9 @@ namespace Municipei.Models
         [FirestoreProperty("email")]
         public string? Email { get; set; }
 
+        [FirestoreProperty("date_start")]
+        public string? Date_Start { get; set; }
+
          public List<MunicipiosList> Municipios { get; set; } = new();
     }
 }

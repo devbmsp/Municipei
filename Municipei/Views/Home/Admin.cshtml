@@ -1,11 +1,83 @@
-﻿@model HomeModel
+﻿@model Municipei.Models.AdminViewModel
 @{
     ViewData["Title"] = "Painel Master";
 }
-@if (Model == null || Model.Occupation != "admin" )
+ @if (TempData["MensagemSucesso"] != null)
+    {
+        <div class="alert alert-success" role="alert">
+            <button type="button" class="btn btn-danger btn-sm close-alert" data-bs-dismiss="alert" aria-label="Close">X</button>
+            @TempData["MensagemSucesso"]
+        </div>
+    }
+ @if (TempData["MensagemErro"] != null)
+    {
+        <div class="alert alert-danger" role="alert">
+            <button type="button" class="btn btn-danger btn-sm close-alert" data-bs-dismiss="alert" aria-label="Close">X</button>
+            @TempData["MensagemErro"]
+        </div>
+    }
+@if (Model?.UsuarioLogado == null || Model.UsuarioLogado.Occupation != "admin" )
 {
-    <h1>Você não possui permissão para acessar essa página, Somente Administradores são autorizados</h1>
+    <h1>Você não possui permissão para acessar essa página. Somente Administradores são autorizados.</h1>
 }
-else{
-    <h1>Bem Vindo ao Painel Principal @Model.Name</h1>
+else
+{
+    <h1>Bem Vindo ao Painel Principal, @Model.UsuarioLogado.Name</h1>
+    
+    <div id="filtros" style="margin-bottom:20px;">
+        <form id="filterForm" onsubmit="return false;">
+            <div>
+                <label for="municipio">Município:</label>
+                <input type="text" id="municipio" placeholder="Digite o município" />
+            </div>
+            <div>
+                <label for="cargo">Cargo:</label>
+                <input type="text" id="cargo" placeholder="Digite o cargo" />
+            </div>
+            <div>
+                <label for="dataInicio">Data de Cadastro (Início):</label>
+                <input type="date" id="dataInicio" />
+            </div>
+            <div>
+                <label for="dataFim">Data de Cadastro (Fim):</label>
+                <input type="date" id="dataFim" />
+            </div>
+            <div>
+                <button type="button" onclick="filterTable()">Filtrar</button>
+                <button type="button" onclick="resetFilters()">Limpar Filtros</button>
+            </div>
+        </form>
+    </div>
+
+    <table id="cadastrosTable" border="1" style="width:100%; border-collapse: collapse;">
+        <thead>
+            <tr>
+                <th>Nome</th>
+                <th>Email</th>
+                <th>Município</th>
+                <th>Telefone</th>
+                <th>Cargo</th>
+                <th>Data de Cadastro</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach(var usuario in Model?.Usuarios)
+            {
+                <tr>
+                    <td>@usuario.Name</td>
+                    <td>@usuario.Email</td>
+                    <td>@usuario.MunPR</td>
+                    <td>@usuario.Phone</td>
+                    <td>@usuario.Occupation</td>
+                    <td>@usuario.Date_Start</td>
+                     <td><form method="post" asp-action="PdfToEmail" asp-controller="Home">
+                <input type="hidden"  name="email"value="@usuario.Email" />
+                <input type="hidden" name="municipio" value="@usuario.MunPR" />
+                <button type="submit">Enviar PDF</button> </form></td>
+
+                </tr>
+            }
+        </tbody>
+    </table>
+
 }

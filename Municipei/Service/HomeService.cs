@@ -9,6 +9,13 @@ namespace Municipei.Service
 {
     public class HomeService : IHomeModel
     {
+        private readonly GoogleDriveService _driveService;
+
+        public HomeService(GoogleDriveService driveService)
+        {
+            _driveService = driveService;
+        }
+
         public async Task<string> SendCode(string email, CollectionReference user)
         {
             try
@@ -55,8 +62,10 @@ namespace Municipei.Service
         {
             try
             {
+                model.Date_Start = DateTime.Now.ToString("dd/MM/yyyy");
                 var newUser = new HomeModel()
                 {
+                    Date_Start = model.Date_Start,
                     Password = model.Password,
                     Cpf = model.Cpf,
                     Email = model.Email,
@@ -68,7 +77,7 @@ namespace Municipei.Service
                 await user.AddAsync(newUser);
                 return newUser;
             }
-            catch(Exception)
+            catch (Exception)
             {
                 return null;
             }
@@ -115,5 +124,65 @@ namespace Municipei.Service
                 return null;
             }
         }
+
+        public async Task<List<HomeModel>> GetUsers(CollectionReference user)
+        {
+            var snapshot = await user.GetSnapshotAsync();
+            var listaDeUsuarios = new List<HomeModel>();
+            foreach (var doc in snapshot.Documents)
+            {
+                var usuario = doc.ConvertTo<HomeModel>();
+                listaDeUsuarios.Add(usuario);
+            }
+            return listaDeUsuarios;
+        }
+        public async Task<bool> SendPdf(CollectionReference user, string email, string municipio)
+        {
+            try
+            {
+                var query = user.WhereEqualTo("email", email);
+                var snapshot = await query.GetSnapshotAsync();
+                if (snapshot.Count == 0)
+                {
+                    return false;
+                }
+                string pdfName = municipio + ".pdf";
+
+                var fileId = await _driveService.ObterFileIdPorNomeAsync(pdfName);
+                if (string.IsNullOrEmpty(fileId))
+                {
+                    return false;
+                }
+
+                var pdfStream = await _driveService.DownloadFileAsync(fileId);
+
+                string fromEmail = "brunomatheuspires1@gmail.com";
+                string fromPassword = "ayqj idau ihge krnw ";
+
+                var message = new MimeMessage();
+                message.From.Add(new MailboxAddress("Municipei", fromEmail));
+                message.To.Add(new MailboxAddress("", email));
+                message.Subject = $"Documento PDF - {municipio}";
+
+                var builder = new BodyBuilder();
+                builder.HtmlBody = $"<p>Olá, Segue seu documento referente a {municipio} em anexo.</p>";
+                builder.Attachments.Add($"{municipio}.pdf", pdfStream, new ContentType("application", "pdf"));
+                message.Body = builder.ToMessageBody();
+
+                using var client = new SmtpClient();
+                await client.ConnectAsync("smtp.gmail.com", 587, SecureSocketOptions.StartTls);
+                await client.AuthenticateAsync(fromEmail, fromPassword);
+                await client.SendAsync(message);
+                await client.DisconnectAsync(true);
+
+                return true;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Erro ao enviar PDF do Drive: {ex.Message}");
+                return false;
+            }
+        }
+
     }
 }

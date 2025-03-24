@@ -11,6 +11,8 @@
   <ItemGroup>
     <PackageReference Include="FirebaseAdmin" Version="3.1.0" />
     <PackageReference Include="FireSharp.Serialization.JsonNet" Version="1.0.1" />
+    <PackageReference Include="Google.Apis.Auth" Version="1.69.0" />
+    <PackageReference Include="Google.Apis.Drive.v3" Version="1.69.0.3703" />
     <PackageReference Include="Microsoft.AspNetCore.Session" Version="2.3.0" />
     <PackageReference Include="RealTimeDataBase" Version="3.4.0" />
     <PackageReference Include="FirebaseDatabase.net" Version="4.2.0" />

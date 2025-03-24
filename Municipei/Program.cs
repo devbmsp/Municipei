@@ -13,6 +13,10 @@ FirebaseApp.Create(new AppOptions
 {
     Credential = credential
 });
+builder.Services.AddSingleton<GoogleDriveService>(provider =>
+{
+    return new GoogleDriveService("wwwroot/Data/municipeibd-firebase-adminsdk-fbsvc-85a7e4a7f5.json");
+});
 
 var firestoreClientBuilder = new FirestoreClientBuilder
 {
@@ -26,13 +30,18 @@ builder.Services.AddSingleton(data);
 
 builder.Services.AddControllersWithViews();
 
+builder.Services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
 builder.Services.AddScoped<IHomeModel, HomeService>();
 builder.Services.AddScoped<ISessao, Sessao>();
 
 builder.Services.AddHttpContextAccessor();
 
 builder.Services.AddDistributedMemoryCache();
-builder.Services.AddSession();
+builder.Services.AddSession(options => {
+    options.IdleTimeout = TimeSpan.FromMinutes(10); 
+    options.Cookie.HttpOnly = true;
+    options.Cookie.IsEssential = true;
+});
 
 var app = builder.Build();
 
@@ -48,13 +57,10 @@ app.UseStaticFiles();
 
 app.UseRouting();
 
-// Habilita uso de sessão
 app.UseSession();
 
-// Se precisar de autorização
 app.UseAuthorization();
 
-// Mapeamento de rotas
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}"
