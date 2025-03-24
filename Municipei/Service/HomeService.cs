@@ -45,11 +45,6 @@ namespace Municipei.Service
             }
         }
 
-        public async Task<HomeModel> Login(HomeModel model, CollectionReference user)
-        {
-            throw new NotImplementedException();
-        }
-
         public async Task<HomeModel> RegisterClient(HomeModel model, CollectionReference user)
         {
             var newUser = new HomeModel()
@@ -64,6 +59,46 @@ namespace Municipei.Service
             };
             await user.AddAsync(newUser);
             return newUser;
+        }
+
+        public async Task<HomeModel> Login(string email, string pass, CollectionReference user)
+        {
+           try
+            {
+                var query = user.WhereEqualTo("email", email);
+                var snapshot = await query.GetSnapshotAsync();
+                var infoLogin = snapshot.Documents.FirstOrDefault();
+                if (infoLogin != null)
+                {
+                    string password = infoLogin.GetValue<string>("password");
+                    if (password != null && password == pass)
+                    {
+                        string emailUser = infoLogin.GetValue<string>("email");
+                        string cpf = infoLogin.GetValue<string>("cpf");
+                        string occup = infoLogin.GetValue<string>("occupation");
+                        string munpr = infoLogin.GetValue<string>("munPR");
+                        string phone = infoLogin.GetValue<string>("phone");
+                        string name = infoLogin.GetValue<string>("name");
+                        var userEnter = new HomeModel()
+                        {
+                            Password = password,
+                            Cpf = cpf,
+                            Email = emailUser,
+                            MunPR = munpr,
+                            Name = name,
+                            Occupation = occup,
+                            Phone = phone
+                        };
+                        return userEnter;
+                    }
+                }
+                    return null;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("Erro ao realizar o login: " + ex.Message);
+                return null;
+            }
         }
     }
 }

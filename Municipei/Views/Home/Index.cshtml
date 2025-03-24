@@ -1,62 +1,68 @@
-﻿@model Municipei.Models.HomeModel
-@{
-    ViewData["Title"] = "Formulário de Cadastro Público";
-}
+﻿    @model HomeModel
+    @{
+        ViewData["Title"] = "Formulário de Cadastro Público";
+    }
 
-@if (TempData["MensagemErro"] != null)
-{
-    <div class="alert alert-danger" role="alert">
-        <button type="button" class="btn btn-danger btn-sm close-alert" data-bs-dismiss="alert" aria-label="Close">X</button>
-        @TempData["MensagemErro"]
-    </div>
-}
-@if (TempData["MensagemSucesso"] != null)
-{
-    <div class="alert alert-success" role="alert">
-        <button type="button" class="btn btn-danger btn-sm close-alert" data-bs-dismiss="alert" aria-label="Close">X</button>
-        @TempData["MensagemSucesso"]
-    </div>
-}
+    @if (TempData["MensagemErro"] != null)
+    {
+        <div class="alert alert-danger" role="alert">
+            <button type="button" class="btn btn-danger btn-sm close-alert" data-bs-dismiss="alert" aria-label="Close">X</button>
+            @TempData["MensagemErro"]
+        </div>
+    }
+    @if (TempData["MensagemSucesso"] != null)
+    {
+        <div class="alert alert-success" role="alert">
+            <button type="button" class="btn btn-danger btn-sm close-alert" data-bs-dismiss="alert" aria-label="Close">X</button>
+            @TempData["MensagemSucesso"]
+        </div>
+    }
 
-<form asp-action="Authorization" method="post" class="row g-3">
-    @Html.AntiForgeryToken()
-    <h1>Formulário de Cadastro Público</h1>
+    <form asp-action="Authorization" method="post" class="row g-3">
+        @Html.AntiForgeryToken()
+        <h1>Formulário de Cadastro Público</h1>
 
-    <div class="col-md-4">
-        <label asp-for="Name"></label>
-        <input asp-for="Name" class="form-control" placeholder="Digite seu nome..." required />
-    </div>
-    <div class="col-md-4">
-        <label asp-for="Password"></label>
-        <input required asp-for="Password" type="password" class="form-control" placeholder="A senha deve ter no mínimo 4 caracteres"/>
-    </div>
-    <div class="col-md-2">
-        <label asp-for="Cpf"></label>
-        <input asp-for="Cpf" class="form-control" required />
-    </div>
-    <div class="col-md-4">
-        <label asp-for="MunPR">Município</label>
-        <select asp-for="MunPR" class="form-select" required><option>Selecione seu Município...</option></select>
-    </div>
-    <div class="col-md-4">
-        <label asp-for="Occupation">Cargo</label>
-        <select asp-for="Occupation" class="form-select" required>
-            <option>Selecione seu Cargo...</option>
-            <option>Prefeito</option>
-            <option>Secretário de Finanças</option>
-            <option>Cobrador</option>
-        </select>
+        <div class="col-md-4">
+            <label asp-for="Name"></label>
+            <input asp-for="Name" class="form-control" placeholder="Digite seu nome..." required />
+        </div>
+        <div class="col-md-4">
+            <label asp-for="Password"></label>
+            <input required asp-for="Password" type="password" class="form-control" placeholder="A senha deve ter no mínimo 4 caracteres"/>
+        </div>
+        <div class="col-md-2">
+            <label asp-for="Cpf"></label>
+            <input asp-for="Cpf" class="form-control"  placeholder="xxx.xxx.xxx-xx" required/>
+        </div>
+        <div class="col-md-4">
+            <label asp-for="MunPR">Município</label>
+            <select asp-for="MunPR" class="form-select" required> 
+                <option value="" disabled selected>Selecione um município...</option>
+                @foreach (var municipio in Model.Municipios)
+                {
+                    <option>@municipio.NomeMunicipio</option>
+                }
+            </select>
+        </div>
+        <div class="col-md-4">
+            <label asp-for="Occupation">Cargo</label>
+            <select asp-for="Occupation" class="form-select" required>
+               <option value="" disabled selected>Selecione seu Cargo...</option>
+                <option>Prefeito</option>
+                <option>Secretário de Finanças</option>
+                <option>Cobrador</option>
+            </select>
 
-    </div>
-    <div class="col-2">
-        <label asp-for="Phone"></label>
-        <input asp-for="Phone" class="form-control" required />
-    </div>
-    <div class="col-md-4">
-        <label asp-for="Email"></label>
-        <input asp-for="Email" class="form-control" id="regEmail" placeholder="Ex: seuemail@email.com.br" required />
-    </div>
-    <div class="col-12">
-        <button type="submit" class="btn btn-primary">Gerar Código </button>
-    </div>
-</form>
+        </div>
+        <div class="col-2">
+            <label asp-for="Phone"></label>
+            <input asp-for="Phone" class="form-control" placeholder="(XX) XXXXX-XXXX" required />
+        </div>
+        <div class="col-md-4">
+            <label asp-for="Email"></label>
+            <input asp-for="Email" class="form-control" id="regEmail" placeholder="Ex: seuemail@email.com.br" required />
+        </div>
+        <div class="col-12">
+            <button type="submit" class="btn btn-primary">Gerar Código </button>
+        </div>
+    </form>

@@ -7,7 +7,7 @@ namespace Municipei.Interface
     {
          Task<HomeModel> RegisterClient(HomeModel model, CollectionReference user);
 
-         Task<HomeModel> Login(HomeModel model, CollectionReference user);
+         Task<HomeModel> Login(string email, string pass, CollectionReference user);
 
          Task<string> SendCode(string email);
 

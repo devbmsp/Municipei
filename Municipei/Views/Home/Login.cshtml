@@ -1,35 +1,40 @@
-﻿
+﻿@model Municipei.Models.HomeModel
+
 @{
     ViewData["Title"] = "Login Do Cadastro Público";
 }
-@if (TempData["MensagemErro"] != null)
+
+@if (TempData["MensagemErro"] != null)  
 {
     <div class="alert alert-danger" role="alert">
         <button type="button" class="btn btn-danger btn-sm close-alert" data-bs-dismiss="alert" aria-label="Close">X</button>
         @TempData["MensagemErro"]
     </div>
 }
+
 @if (TempData["MensagemSucesso"] != null)
 {
     <div class="alert alert-success" role="alert">
-        <button type="button" class="btn btn-Success btn-sm close-alert" data-bs-dismiss="alert" aria-label="Close">X</button>
+        <button type="button" class="btn btn-success btn-sm close-alert" data-bs-dismiss="alert" aria-label="Close">X</button>
         @TempData["MensagemSucesso"]
     </div>
 }
 
 <h1>Login Do Cadastro Público</h1>
-<br/>
-<form>
+
+<form asp-action="LoginUser" asp-controller="Home" method="get">
     <div class="row mb-3">
-        <label for="inputEmail3" class="col-sm-2 col-form-label">Email</label>
+        <label asp-for="Email" for="inputEmail3" class="col-sm-2 col-form-label">Email</label>
         <div class="col-sm-10">
-            <input type="email" class="form-control" id="inputEmail3" placeholder="Ex: seuemail@email.com.br" required>
+            <input asp-for="Email" type="email" class="form-control" id="inputEmail3" 
+                   placeholder="Ex: email@seuemail.com" required />
         </div>
     </div>
     <div class="row mb-3">
-        <label for="inputPassword3" class="col-sm-2 col-form-label">Senha</label>
+        <label asp-for="Password" for="inputPassword3" class="col-sm-2 col-form-label">Senha</label>
         <div class="col-sm-10">
-            <input type="password" class="form-control" id="inputPassword3" laceholder="A senha deve ter no mínimo 4 caracteres" required>
+            <input asp-for="Password" type="password" class="form-control" id="inputPassword3" 
+                   placeholder="A senha deve ter no mínimo 4 caracteres" required  minlength="4"/>
         </div>
     </div>
     <button type="submit" class="btn btn-primary">Entrar</button>

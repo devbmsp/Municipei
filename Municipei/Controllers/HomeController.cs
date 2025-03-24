@@ -5,17 +5,19 @@ using Google.Cloud.Firestore;
 using Municipei.Interface;
 using Google.Rpc;
 using Newtonsoft.Json;
+using MunModel;
+using FirebaseAdmin.Auth;
 
 namespace Municipei.Controllers
 {
     public class HomeController : Controller
     {
-        
+        private readonly string admin = "admin@admin.com";
+        private readonly string passwordAdmin = "admin123";
+        private readonly string occupationadm = "admin";
+
         private FirestoreDb _bd;
-        
         private readonly IHomeModel _service;
-
-
         public HomeController(FirestoreDb db, IHomeModel service)
         {
             _bd = db;
@@ -23,7 +25,14 @@ namespace Municipei.Controllers
         }
         public IActionResult Index()
         {
-            return View();
+            var json = System.IO.File.ReadAllText("wwwroot/Data/JsonModel.Json");
+            var municipios = JsonConvert.DeserializeObject<List<MunicipiosList>>(json)!;
+
+            var model = new HomeModel
+            {
+                Municipios = municipios
+            };
+            return View(model);
         }
 
         public IActionResult Login()
@@ -38,14 +47,44 @@ namespace Municipei.Controllers
         {
             return View();
         }
+        [HttpGet]
+        public async Task<IActionResult> LoginUser(string email, string password)
+        {
+            try
+            {
+                CollectionReference userBD = _bd.Collection("user");
+                HomeModel user = await _service.Login(email, password, userBD);
+                if (user == null)
+                {
+                    TempData["MensagemErro"] = "E-mail ou senha inválidos";
+                    return View("Login");
+                }
+                else if (user.Email == admin && user.Occupation == occupationadm && user.Password == passwordAdmin)
+                {
+                    TempData["MensagemSucesso"] = "Bem-vindo Admin!";
+                    return View("Admin", user);
+                }
+                else
+                {
+                    TempData["MensagemSucesso"] = $"Login realizado com sucesso: ";
+                    return View("DashBoard", user);
+                }
+            }
+            catch (Exception)
+            {
+                TempData["MensagemErro"] = "Não conseguimos realizar seu Login";
+                return View("Login");
+            }
+
+        }
+
         [HttpPost]
         public async Task<IActionResult> Authorization(HomeModel model)
         {
             try
             {
-
                 var code = await _service.SendCode(model.Email);
-                if (code == "Erro")
+                if (code == "Erro" || code == null)
                 {
                     TempData["MensagemErro"] = "Não conseguimos realizar sua autenticação";
                     return View("Index");
@@ -70,7 +109,6 @@ namespace Municipei.Controllers
             {
                 var code = TempData["AuthCode"] as string;
                 if (answer == code)
-             
                 {
                     CollectionReference user = _bd.Collection("user");
                     await _service.RegisterClient(model, user);
@@ -82,9 +120,9 @@ namespace Municipei.Controllers
                     TempData["MensagemErro"] = "Não conseguimos realizar Sua Authenticação";
                     return View("Index");
                 }
-                
+
             }
-            catch(Exception)
+            catch (Exception)
             {
                 TempData["MensagemErro"] = "Não conseguimos realizar seu Cadastro";
                 return View("Index");

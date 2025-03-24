@@ -1,18 +1,16 @@
 ﻿using FirebaseAdmin;
-using FireSharp.Config;
-using FireSharp.Interfaces;
-using FireSharp.Response;
-using Google.Apis.Auth.OAuth2;
 using FirebaseAdmin.Auth;
-using Firebase.Database;
-using Firebase.Database.Query;
+using Google.Apis.Auth.OAuth2;
 using Google.Cloud.Firestore;
 using Google.Cloud.Firestore.V1;
 using Municipei.Interface;
 using Municipei.Service;
+using System.Text.Json;
+using System.Text;
+
 
 var builder = WebApplication.CreateBuilder(args);
-GoogleCredential credential = GoogleCredential.FromFile("/Users/bm/Projects/Municipei/Municipei/Data/municipeibd-firebase-adminsdk-fbsvc-85a7e4a7f5.json");
+GoogleCredential credential = GoogleCredential.FromFile("wwwroot/Data/municipeibd-firebase-adminsdk-fbsvc-85a7e4a7f5.json");
 FirebaseApp.Create(new AppOptions()
 {
     Credential = credential
