@@ -53,7 +53,7 @@ namespace Municipei.Controllers
 
             if (usuarioLogado == null || usuarioLogado.Occupation != "admin")
             {
-                return RedirectToAction("Admin", null);
+                return View ("Admin", null);
             }
 
             var listaBD = await _service.GetUsers(_userCollection);
@@ -72,15 +72,15 @@ namespace Municipei.Controllers
 
             if (usuarioLogado == null)
             {
-                return RedirectToAction("Perfil", null);
+                return View("Perfil", null);
             }
 
-            return RedirectToAction("Perfil", usuarioLogado);
+            return View("Perfil", usuarioLogado);
         }
         public IActionResult Sair()
         {
             _sessao.RemoverSessaoUsuario();
-            return RedirectToAction("Login");
+            return View("Login");
         }
         [HttpPost]
         public async Task<IActionResult> LoginUser(string email, string password)
@@ -103,7 +103,7 @@ namespace Municipei.Controllers
                     catch (Exception ex)
                     {
                         TempData["MensagemErro"] = "Não foi possivel estabalecer a conexão !";
-                        return RedirectToAction("Login");
+                        return View("Login");
                     }
                     TempData["MensagemSucesso"] = "Bem-vindo Admin!";
                     var admin = new AdminViewModel()
@@ -111,20 +111,20 @@ namespace Municipei.Controllers
                         UsuarioLogado = user,
                         Usuarios = await _service.GetUsers(_userCollection)
                     };
-                    return RedirectToAction("Admin", admin);
+                    return View("Admin", admin);
                 }
                 else
                 {
                     TempData["MensagemSucesso"] = $"Login realizado com sucesso: ";
                     HttpContext.Session.SetString("UserId", user.Id.ToString());
                     _sessao.CriarSessaoDoUsuario(user);
-                    return RedirectToAction("Perfil", user);
+                    return View("Perfil", user);
                 }
             }
             catch (Exception)
             {
                 TempData["MensagemErro"] = "Não conseguimos realizar seu Login";
-                return RedirectToAction("Login");
+                return View("Login");
             }
 
         }
@@ -139,24 +139,24 @@ namespace Municipei.Controllers
                 if (code == null)
                 {
                     TempData["MensagemErro"] = "Conta já existente com esse email";
-                    return RedirectToAction("Index");
+                    return View("Index");
                 }
                 if (code == "Erro" || code == null)
                 {
                     TempData["MensagemErro"] = "Não conseguimos realizar sua autenticação";
-                    return RedirectToAction("Index");
+                    return View("Index");
                 }
                 else
                 {
                     TempData["AuthCode"] = code;
                     TempData["HomeModel"] = JsonConvert.SerializeObject(model);
-                    return RedirectToAction("CodeValidate");
+                    return View("CodeValidate");
                 }
             }
             catch
             {
                 TempData["MensagemErro"] = "Não conseguimos realizar sua autenticação";
-                return RedirectToAction("Index");
+                return View("Index");
             }
         }
 
@@ -196,22 +196,22 @@ namespace Municipei.Controllers
                     if (response != null)
                     {
                         TempData["MensagemSucesso"] = "Conseguimos realizar Sua Authenticação, Perfil Criado!";
-                        return RedirectToAction("Login");
+                        return View("Login");
                     }
                     TempData["MensagemErro"] = "Não conseguimos realizar Sua Authenticação";
-                    return RedirectToAction("Index");
+                    return View("Index");
                 }
                 else
                 {
                     TempData["MensagemErro"] = "Não conseguimos realizar Sua Authenticação";
-                    return RedirectToAction("Index");
+                    return View("Index");
                 }
 
             }
             catch (Exception)
             {
                 TempData["MensagemErro"] = "Não conseguimos realizar seu Cadastro";
-                return RedirectToAction("Index");
+                return View("Index");
             }
         }
     }
